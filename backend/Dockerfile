@@ -1,18 +1,21 @@
 FROM node:20-alpine
 
+# Install OpenSSL - required by Prisma on Alpine Linux
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
-# Copy package files
+# Copy package files and prisma schema first
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install ALL dependencies (including dev for build)
+# Install all dependencies
 RUN npm install
 
-# Generate Prisma client
+# Generate Prisma client for Linux (inside the container)
 RUN npx prisma generate
 
-# Copy source code
+# Copy rest of source code
 COPY . .
 
 # Build TypeScript
