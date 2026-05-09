@@ -1,0 +1,220 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(uuid())
+  name             String
+  email            String    @unique
+  password         String
+  profileImage     String?
+  monthlyIncome    Float     @default(0)
+  savingsGoal      Float     @default(0)
+  preferredCurrency String   @default("USD")
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  isVerified       Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  expenses          Expense[]
+  budgets           Budget[]
+  notifications     Notification[]
+  recurringExpenses RecurringExpense[]
+  aiInsights        AiInsight[]
+  reports           Report[]
+
+  @@map("users")
+}
+
+model Expense {
+  id              String   @id @default(uuid())
+  userId          String
+  title           String
+  amount          Float
+  category        Category @default(OTHERS)
+  paymentMethod   PaymentMethod @default(CASH)
+  merchantName    String?
+  date            DateTime @default(now())
+  notes           String?
+  isRecurring     Boolean  @default(false)
+  receiptImage    String?
+  aiConfidence    Float?
+  aiCategory      String?
+  ocrText         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
+  @@index([userId])
+  @@index([date])
+  @@index([category])
+}
+
+model Budget {
+  id          String   @id @default(uuid())
+  userId      String
+  month       Int
+  year        Int
+  totalBudget Float    @default(0)
+  spent       Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryBudgets  CategoryBudget[]
+
+  @@unique([userId, month, year])
+  @@map("budgets")
+}
+
+model CategoryBudget {
+  id        String   @id @default(uuid())
+  budgetId  String
+  category  Category
+  limit     Float
+  spent     Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  @@unique([budgetId, category])
+  @@map("category_budgets")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  metadata  Json?
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+  @@index([userId])
+}
+
+model RecurringExpense {
+  id            String   @id @default(uuid())
+  userId        String
+  title         String
+  amount        Float
+  category      Category
+  merchantName  String?
+  frequency     Frequency
+  nextDueDate   DateTime
+  lastPaidDate  DateTime?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("recurring_expenses")
+  @@index([userId])
+}
+
+model AiInsight {
+  id          String      @id @default(uuid())
+  userId      String
+  type        InsightType
+  title       String
+  description String
+  data        Json?
+  month       Int
+  year        Int
+  createdAt   DateTime    @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_insights")
+  @@index([userId])
+}
+
+model Report {
+  id        String     @id @default(uuid())
+  userId    String
+  month     Int
+  year      Int
+  type      ReportType
+  fileUrl   String?
+  data      Json?
+  createdAt DateTime   @default(now())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+  @@index([userId])
+}
+
+enum Category {
+  FOOD
+  TRAVEL
+  SHOPPING
+  ENTERTAINMENT
+  BILLS
+  HEALTHCARE
+  EDUCATION
+  INVESTMENTS
+  GROCERIES
+  SUBSCRIPTIONS
+  OTHERS
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  UPI
+  NET_BANKING
+  WALLET
+  CRYPTO
+  OTHER
+}
+
+enum NotificationType {
+  BUDGET_EXCEEDED
+  OVERSPENDING
+  SUBSCRIPTION_RENEWAL
+  RECURRING_BILL
+  MONTHLY_REPORT
+  SAVINGS_GOAL
+  GENERAL
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum InsightType {
+  SPENDING_SUMMARY
+  SAVINGS_SUGGESTION
+  BUDGET_WARNING
+  HEALTH_SCORE
+  OVERSPENDING_ALERT
+  MONTHLY_ANALYSIS
+  BEHAVIOR_INSIGHT
+}
+
+enum ReportType {
+  PDF
+  CSV
+  JSON
+}

@@ -1,0 +1,91 @@
+# ===========================
+# DEPENDENCIES
+# ===========================
+node_modules/
+**/node_modules/
+
+# ===========================
+# BUILD OUTPUTS
+# ===========================
+dist/
+build/
+.next/
+out/
+**/dist/
+**/.next/
+
+# ===========================
+# ENVIRONMENT FILES (secrets)
+# ===========================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+
+# ===========================
+# LOGS
+# ===========================
+logs/
+*.log
+npm-debug.log*
+**/logs/
+
+# ===========================
+# UPLOADS (user files)
+# ===========================
+uploads/**/*
+!uploads/.gitkeep
+**/uploads/**/*
+!**/uploads/.gitkeep
+
+# ===========================
+# LOCK FILES (large, regenerated)
+# ===========================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ===========================
+# LARGE BINARY FILES
+# ===========================
+*.traineddata
+*.bin
+*.dat
+*.exe
+*.dmg
+
+# ===========================
+# OS FILES
+# ===========================
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ===========================
+# IDE FILES
+# ===========================
+.idea/
+*.swp
+*.swo
+*.suo
+*.user
+
+# ===========================
+# TYPESCRIPT CACHE
+# ===========================
+*.tsbuildinfo
+
+# ===========================
+# MISC
+# ===========================
+.cache/
+tmp/
+temp/
+coverage/
+.nyc_output/

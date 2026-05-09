@@ -1,0 +1,67 @@
+# Dependencies - NEVER commit these
+node_modules/
+**/node_modules/
+
+# Next.js build output
+.next/
+**/.next/
+out/
+**/out/
+
+# Backend build
+dist/
+**/dist/
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+**/.env.test
+
+# Logs
+logs/
+**/logs/
+*.log
+npm-debug.log*
+
+# Uploads
+uploads/**
+!uploads/.gitkeep
+**/uploads/**
+!**/uploads/.gitkeep
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Large binary files
+*.traineddata
+*.node
+*.bin
+*.dat
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Misc
+.cache/
+tmp/
+temp/
+coverage/
