@@ -133,7 +133,7 @@ function extractReceiptData(text: string): Partial<OcrResult> {
     }
   }
 
-  // Extract date
+  // Extract date and convert to YYYY-MM-DD for HTML date input
   const datePatterns = [
     /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/,
     /(\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2})/,
@@ -143,7 +143,16 @@ function extractReceiptData(text: string): Partial<OcrResult> {
   for (const pattern of datePatterns) {
     const match = text.match(pattern);
     if (match) {
-      result.date = match[1];
+      // Try to convert to YYYY-MM-DD format for the date input
+      const raw = match[1];
+      const ddmmyy = raw.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+      if (ddmmyy) {
+        let [, day, month, year] = ddmmyy;
+        if (year.length === 2) year = `20${year}`;
+        result.date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      } else {
+        result.date = raw;
+      }
       break;
     }
   }

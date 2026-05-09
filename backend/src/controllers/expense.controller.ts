@@ -7,6 +7,37 @@ import { Category, PaymentMethod } from '@prisma/client';
 const getId = (param: string | string[]): string =>
   Array.isArray(param) ? param[0] : param;
 
+// Safely parse any date string - handles DD/MM/YY, DD/MM/YYYY, YYYY-MM-DD, ISO etc.
+function safeParseDate(dateStr: string | undefined): Date {
+  if (!dateStr) return new Date();
+
+  // Already a valid ISO date (YYYY-MM-DD or full ISO)
+  const iso = new Date(dateStr);
+  if (!isNaN(iso.getTime())) return iso;
+
+  // Try DD/MM/YY or DD/MM/YYYY (common OCR format)
+  const ddmmyy = dateStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+  if (ddmmyy) {
+    let [, day, month, year] = ddmmyy;
+    // Fix 2-digit year: 25 → 2025
+    if (year.length === 2) year = `20${year}`;
+    const parsed = new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+
+  // Try MM/DD/YYYY
+  const mmddyyyy = dateStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+  if (mmddyyyy) {
+    const [, month, day, year] = mmddyyyy;
+    const parsed = new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+
+  // Fallback to today
+  logger.warn(`Could not parse date: "${dateStr}", using today`);
+  return new Date();
+}
+
 export const createExpense = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const {
@@ -24,7 +55,7 @@ export const createExpense = async (req: AuthRequest, res: Response): Promise<vo
         category: (category as Category) || 'OTHERS',
         paymentMethod: (paymentMethod as PaymentMethod) || 'CASH',
         merchantName,
-        date: date ? new Date(date) : new Date(),
+        date: safeParseDate(date),
         notes,
         isRecurring: isRecurring === 'true' || isRecurring === true,
         receiptImage,
@@ -149,7 +180,7 @@ export const updateExpense = async (req: AuthRequest, res: Response): Promise<vo
     if (category) updateData.category = category as Category;
     if (paymentMethod) updateData.paymentMethod = paymentMethod as PaymentMethod;
     if (merchantName !== undefined) updateData.merchantName = merchantName;
-    if (date) updateData.date = new Date(date);
+    if (date) updateData.date = safeParseDate(date);
     if (notes !== undefined) updateData.notes = notes;
     if (isRecurring !== undefined) updateData.isRecurring = isRecurring === 'true' || isRecurring === true;
     if (receiptImage) updateData.receiptImage = receiptImage;

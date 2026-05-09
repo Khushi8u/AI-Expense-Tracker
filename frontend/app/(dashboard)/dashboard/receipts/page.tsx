@@ -22,11 +22,21 @@ export default function ReceiptsPage() {
   const [result, setResult] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  // Editable fields so user can fix OCR mistakes
   const [editAmount, setEditAmount] = useState('');
   const [editTitle, setEditTitle] = useState('');
   const [editMerchant, setEditMerchant] = useState('');
   const [editDate, setEditDate] = useState('');
+
+  // Check if a string is a valid YYYY-MM-DD date for HTML input
+  function isValidDateInput(d: string | undefined): boolean {
+    if (!d) return false;
+    return /^\d{4}-\d{2}-\d{2}$/.test(d) && !isNaN(new Date(d).getTime());
+  }
+
+  // Get today as YYYY-MM-DD
+  function today(): string {
+    return new Date().toISOString().split('T')[0];
+  }
 
   const onDrop = useCallback(async (files: File[]) => {
     if (!files[0]) return;
@@ -59,7 +69,8 @@ export default function ReceiptsPage() {
         confidence,
         title: ocr.merchantName || 'Receipt Expense',
         amount: ocr.amount ? String(ocr.amount) : '',
-        date: ocr.date || new Date().toISOString().split('T')[0],
+        // Ensure date is in YYYY-MM-DD format for the date input
+        date: isValidDateInput(ocr.date) ? ocr.date : new Date().toISOString().split('T')[0],
         merchantName: ocr.merchantName || '',
       };
 
@@ -67,7 +78,7 @@ export default function ReceiptsPage() {
       setEditTitle(detected.title);
       setEditAmount(detected.amount);
       setEditMerchant(detected.merchantName);
-      setEditDate(detected.date);
+      setEditDate(isValidDateInput(detected.date) ? detected.date : today());
 
       toast({ title: 'Receipt scanned!', description: 'Review the details and save' });
     } catch (err: any) {
@@ -108,7 +119,7 @@ export default function ReceiptsPage() {
       formData.append('amount', String(amount));
       formData.append('category', result.category);
       formData.append('merchantName', editMerchant.trim());
-      formData.append('date', editDate || new Date().toISOString().split('T')[0]);
+      formData.append('date', isValidDateInput(editDate) ? editDate : today());
       formData.append('aiConfidence', String(result.confidence));
       formData.append('ocrText', result.ocr?.text || '');
       if (file) formData.append('receipt', file);
