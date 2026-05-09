@@ -1,4 +1,4 @@
-# Dependencies - NEVER commit these
+# Dependencies
 node_modules/
 **/node_modules/
 
@@ -6,7 +6,6 @@ node_modules/
 .next/
 **/.next/
 out/
-**/out/
 
 # Backend build
 dist/
@@ -47,10 +46,12 @@ pnpm-lock.yaml
 *.bin
 *.dat
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 desktop.ini
+ehthumbs.db
+Desktop.ini
 
 # IDE
 .idea/

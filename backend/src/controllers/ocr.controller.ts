@@ -1,7 +1,6 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middlewares/auth.middleware';
 import { logger } from '../utils/logger';
-import path from 'path';
 import fs from 'fs';
 
 interface OcrResult {
@@ -24,10 +23,11 @@ export const processReceipt = async (req: AuthRequest, res: Response): Promise<v
 
     let ocrResult: OcrResult;
 
-    // Try OCR.Space API first (faster), fallback to Tesseract
-    if (process.env.OCR_SPACE_API_KEY) {
+    if (process.env.OCR_SPACE_API_KEY && process.env.OCR_SPACE_API_KEY !== 'your-ocr-space-api-key') {
+      // Use OCR.Space API if key is configured
       ocrResult = await processWithOcrSpace(filePath, req.file.mimetype);
     } else {
+      // Try Tesseract as fallback
       ocrResult = await processWithTesseract(filePath);
     }
 
@@ -38,15 +38,19 @@ export const processReceipt = async (req: AuthRequest, res: Response): Promise<v
     });
   } catch (error) {
     logger.error('OCR processing error:', error);
-    res.status(500).json({ error: 'Failed to process receipt' });
+    // Return empty OCR result instead of failing — user can fill in manually
+    res.json({
+      success: true,
+      fileUrl: req.file ? `/uploads/receipts/${req.file.filename}` : '',
+      ocr: { text: '', confidence: 0 },
+    });
   }
 };
 
 async function processWithTesseract(filePath: string): Promise<OcrResult> {
   try {
-    // Dynamic import to avoid issues if tesseract is not installed
     const Tesseract = await import('tesseract.js');
-    
+
     const result = await Tesseract.recognize(filePath, 'eng', {
       logger: (m: any) => {
         if (m.status === 'recognizing text') {
@@ -64,7 +68,8 @@ async function processWithTesseract(filePath: string): Promise<OcrResult> {
       ...extractReceiptData(text),
     };
   } catch (error) {
-    logger.error('Tesseract error:', error);
+    logger.warn('Tesseract not available, returning empty OCR result:', error);
+    // Return empty result — user fills in manually on frontend
     return { text: '', confidence: 0 };
   }
 }
@@ -75,9 +80,7 @@ async function processWithOcrSpace(filePath: string, mimeType: string): Promise<
     const axios = (await import('axios')).default;
 
     const formData = new FormData();
-    formData.append('file', fs.createReadStream(filePath), {
-      contentType: mimeType,
-    });
+    formData.append('file', fs.createReadStream(filePath), { contentType: mimeType });
     formData.append('apikey', process.env.OCR_SPACE_API_KEY!);
     formData.append('language', 'eng');
     formData.append('isOverlayRequired', 'false');
@@ -104,8 +107,7 @@ async function processWithOcrSpace(filePath: string, mimeType: string): Promise<
       ...extractReceiptData(text),
     };
   } catch (error) {
-    logger.error('OCR.Space error:', error);
-    // Fallback to Tesseract
+    logger.error('OCR.Space error, falling back to Tesseract:', error);
     return processWithTesseract(filePath);
   }
 }
@@ -113,7 +115,7 @@ async function processWithOcrSpace(filePath: string, mimeType: string): Promise<
 function extractReceiptData(text: string): Partial<OcrResult> {
   const result: Partial<OcrResult> = {};
 
-  // Extract amount - look for patterns like $123.45, ₹1,234.56, Total: 123.45
+  // Extract amount
   const amountPatterns = [
     /(?:total|amount|grand total|subtotal|net amount)[:\s]*[$₹€£¥]?\s*([0-9,]+\.?[0-9]*)/i,
     /[$₹€£¥]\s*([0-9,]+\.[0-9]{2})/,
@@ -146,15 +148,12 @@ function extractReceiptData(text: string): Partial<OcrResult> {
     }
   }
 
-  // Extract merchant name (usually first non-empty line)
+  // Extract merchant name (first clean line)
   const lines = text.split('\n').map((l) => l.trim()).filter((l) => l.length > 2);
-  if (lines.length > 0) {
-    // Skip lines that look like addresses or phone numbers
-    for (const line of lines.slice(0, 5)) {
-      if (!/^\d+$/.test(line) && !/^\+?\d[\d\s\-()]+$/.test(line) && line.length < 50) {
-        result.merchantName = line;
-        break;
-      }
+  for (const line of lines.slice(0, 5)) {
+    if (!/^\d+$/.test(line) && !/^\+?\d[\d\s\-()]+$/.test(line) && line.length < 50) {
+      result.merchantName = line;
+      break;
     }
   }
 

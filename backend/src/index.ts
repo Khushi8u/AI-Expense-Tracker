@@ -17,6 +17,8 @@ import recurringRoutes from './routes/recurring.routes';
 dotenv.config();
 
 const app = express();
+
+// Render assigns PORT dynamically - must use process.env.PORT
 const PORT = process.env.PORT || 5000;
 
 // Security middleware
@@ -24,9 +26,24 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
-// CORS
+// CORS - allow both local dev and production frontend
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:3000',
+  'http://localhost:3000',
+  'http://localhost:3001',
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Allow any netlify.app subdomain
+    if (origin.endsWith('.netlify.app')) return callback(null, true);
+    // Allow any onrender.com subdomain
+    if (origin.endsWith('.onrender.com')) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -49,9 +66,19 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Health check
+// Root - Render health check
+app.get('/', (req, res) => {
+  res.json({
+    message: 'AI Expense Tracker API',
+    status: 'running',
+    version: '1.0.0',
+    environment: process.env.NODE_ENV,
+  });
+});
+
+// Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // API Routes
@@ -78,9 +105,11 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-app.listen(PORT, () => {
+// Start server - bind to 0.0.0.0 for Render
+app.listen(Number(PORT), '0.0.0.0', () => {
   logger.info(`🚀 Server running on port ${PORT}`);
   logger.info(`📊 Environment: ${process.env.NODE_ENV}`);
+  logger.info(`🌐 CORS allowed: ${allowedOrigins.join(', ')}`);
 });
 
 export default app;

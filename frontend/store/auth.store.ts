@@ -30,6 +30,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       setAuth: (user, accessToken, refreshToken) => {
+        // Store in both Zustand (persisted) and localStorage for the axios interceptor
         if (typeof window !== 'undefined') {
           localStorage.setItem('accessToken', accessToken);
           localStorage.setItem('refreshToken', refreshToken);
@@ -58,6 +59,15 @@ export const useAuthStore = create<AuthState>()(
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
+      // Sync localStorage token with Zustand on rehydration
+      onRehydrateStorage: () => (state) => {
+        if (state?.accessToken && typeof window !== 'undefined') {
+          localStorage.setItem('accessToken', state.accessToken);
+        }
+        if (state?.refreshToken && typeof window !== 'undefined') {
+          localStorage.setItem('refreshToken', state.refreshToken);
+        }
+      },
     }
   )
 );

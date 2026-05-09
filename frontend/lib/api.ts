@@ -12,6 +12,7 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     if (typeof window !== 'undefined') {
+      // Read from localStorage (synced by auth store on rehydration)
       const token = localStorage.getItem('accessToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -22,16 +23,25 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor - handle 401
+// Response interceptor - handle 401 and network errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+    if (typeof window !== 'undefined') {
+      if (error.response?.status === 401) {
+        // Clear all auth state and redirect to login
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('auth-storage');
+        window.location.href = '/login';
+      }
     }
+
+    // Improve error messages for network issues
+    if (!error.response) {
+      error.message = 'Cannot connect to server. Make sure the backend is running.';
+    }
+
     return Promise.reject(error);
   }
 );
@@ -96,6 +106,7 @@ export const reportApi = {
 export const notificationApi = {
   getAll: (params?: any) => api.get('/notifications', { params }),
   markRead: (id: string) => api.patch(`/notifications/${id}/read`),
+  markAllRead: () => api.patch('/notifications/all/read'),
   delete: (id: string) => api.delete(`/notifications/${id}`),
 };
 

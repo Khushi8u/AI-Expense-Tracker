@@ -13,37 +13,45 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const { user } = useAuthStore();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     notificationApi.getAll({ unreadOnly: true })
       .then((res) => setUnreadCount(res.data.unreadCount || 0))
       .catch(() => {});
   }, []);
 
   return (
-    <header className="h-16 border-b border-white/10 bg-slate-900/50 backdrop-blur-xl flex items-center justify-between px-6 sticky top-0 z-30">
+    <header className="h-16 border-b border-border bg-card/80 backdrop-blur-xl flex items-center justify-between px-6 sticky top-0 z-30">
       <div className="flex items-center gap-4 flex-1 max-w-md">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search expenses..."
-            className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500 h-9"
+            className="pl-9 h-9"
           />
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="text-white/50 hover:text-white hover:bg-white/10"
-        >
-          {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </Button>
+        {/* Theme toggle - only render after mount to avoid hydration mismatch */}
+        {mounted && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            {theme === 'dark'
+              ? <Sun className="w-4 h-4" />
+              : <Moon className="w-4 h-4" />
+            }
+          </Button>
+        )}
 
         <Link href="/dashboard/notifications">
-          <Button variant="ghost" size="icon" className="relative text-white/50 hover:text-white hover:bg-white/10">
+          <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center font-bold">
