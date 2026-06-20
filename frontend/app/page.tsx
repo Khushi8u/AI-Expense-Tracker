@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowRight, BarChart3, Brain, Receipt, Shield, Sparkles,
-  TrendingUp, Wallet, Zap, Leaf, TreePine, Heart, CheckCircle,
-  ChevronDown, Play, Star, Users, Target, Award,
+  TrendingUp, Wallet, Zap, Leaf, TreePine, Heart,
+  ChevronDown, Play,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -58,9 +58,6 @@ export default function LandingPage() {
   const [activeFeature, setActiveFeature] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const statsRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 400], [0, -80]);
-  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.3]);
 
   const users   = useCounter(50000, 2000, statsVisible);
   const tracked = useCounter(200,   2000, statsVisible);
@@ -112,17 +109,14 @@ export default function LandingPage() {
 
       {/* ── HERO ── */}
       <section className="pt-32 pb-12 px-4 relative overflow-hidden">
-        {/* Animated background blobs */}
+        {/* Static gradient blobs - NO autonomous movement */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div animate={{ x: [0, 30, 0], y: [0, -20, 0] }} transition={{ duration: 8, repeat: Infinity }}
-            className="absolute top-20 left-1/4 w-72 h-72 bg-violet-600/20 rounded-full blur-3xl" />
-          <motion.div animate={{ x: [0, -20, 0], y: [0, 30, 0] }} transition={{ duration: 10, repeat: Infinity }}
-            className="absolute top-40 right-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl" />
-          <motion.div animate={{ x: [0, 15, 0], y: [0, -15, 0] }} transition={{ duration: 12, repeat: Infinity }}
-            className="absolute bottom-0 left-1/3 w-64 h-64 bg-emerald-600/10 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-1/4 w-72 h-72 bg-violet-600/20 rounded-full blur-3xl" />
+          <div className="absolute top-40 right-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-emerald-600/10 rounded-full blur-3xl" />
         </div>
 
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="max-w-7xl mx-auto text-center relative z-10">
+        <motion.div className="max-w-7xl mx-auto text-center relative z-10">
           {/* SDG badges */}
           <div className="flex justify-center gap-2 mb-6 flex-wrap">
             {sdgBadges.map(s => (
@@ -352,9 +346,7 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }}
             className="relative bg-gradient-to-br from-violet-900/50 to-indigo-900/50 rounded-3xl p-12 border border-violet-500/20 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 to-indigo-600/10" />
-            <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-              className="absolute -top-10 -right-10 w-40 h-40 bg-violet-500/10 rounded-full blur-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 to-indigo-600/10 rounded-3xl" />
             <div className="relative z-10">
               <div className="text-5xl mb-4">🚀</div>
               <h2 className="text-4xl font-bold mb-4">Ready to transform your finances?</h2>
