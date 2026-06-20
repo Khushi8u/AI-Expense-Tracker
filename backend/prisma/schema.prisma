@@ -1,4 +1,4 @@
-// This is your Prisma schema file
+// EcoSpend AI - Sustainable Expense Tracker
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
@@ -10,49 +10,57 @@ datasource db {
 }
 
 model User {
-  id               String    @id @default(uuid())
-  name             String
-  email            String    @unique
-  password         String
-  profileImage     String?
-  monthlyIncome    Float     @default(0)
-  savingsGoal      Float     @default(0)
-  preferredCurrency String   @default("USD")
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  isVerified       Boolean   @default(false)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                String    @id @default(uuid())
+  name              String
+  email             String    @unique
+  password          String
+  profileImage      String?
+  monthlyIncome     Float     @default(0)
+  savingsGoal       Float     @default(0)
+  preferredCurrency String    @default("USD")
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  isVerified        Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  expenses          Expense[]
-  budgets           Budget[]
-  notifications     Notification[]
-  recurringExpenses RecurringExpense[]
-  aiInsights        AiInsight[]
-  reports           Report[]
+  expenses            Expense[]
+  budgets             Budget[]
+  notifications       Notification[]
+  recurringExpenses   RecurringExpense[]
+  aiInsights          AiInsight[]
+  reports             Report[]
+  sustainabilityScores SustainabilityScore[]
+  carbonFootprints    CarbonFootprint[]
+  greenGoals          GreenGoal[]
+  ecoReports          EcoReport[]
 
   @@map("users")
 }
 
 model Expense {
-  id              String   @id @default(uuid())
+  id              String        @id @default(uuid())
   userId          String
   title           String
   amount          Float
-  category        Category @default(OTHERS)
+  category        Category      @default(OTHERS)
   paymentMethod   PaymentMethod @default(CASH)
   merchantName    String?
-  date            DateTime @default(now())
+  date            DateTime      @default(now())
   notes           String?
-  isRecurring     Boolean  @default(false)
+  isRecurring     Boolean       @default(false)
   receiptImage    String?
   aiConfidence    Float?
   aiCategory      String?
   ocrText         String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  // Sustainability fields
+  ecoTag          EcoTag?
+  carbonKg        Float?        // Estimated CO2 in kg
+  isSustainable   Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("expenses")
   @@index([userId])
@@ -70,8 +78,8 @@ model Budget {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryBudgets  CategoryBudget[]
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryBudgets CategoryBudget[]
 
   @@unique([userId, month, year])
   @@map("budgets")
@@ -109,20 +117,20 @@ model Notification {
 }
 
 model RecurringExpense {
-  id            String   @id @default(uuid())
-  userId        String
-  title         String
-  amount        Float
-  category      Category
-  merchantName  String?
-  frequency     Frequency
-  nextDueDate   DateTime
-  lastPaidDate  DateTime?
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String    @id @default(uuid())
+  userId       String
+  title        String
+  amount       Float
+  category     Category
+  merchantName String?
+  frequency    Frequency
+  nextDueDate  DateTime
+  lastPaidDate DateTime?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("recurring_expenses")
   @@index([userId])
@@ -161,6 +169,99 @@ model Report {
   @@index([userId])
 }
 
+// =================== SUSTAINABILITY MODELS ===================
+
+model SustainabilityScore {
+  id              String   @id @default(uuid())
+  userId          String
+  month           Int
+  year            Int
+  score           Float    @default(0)   // 0-100
+  positivePoints  Float    @default(0)
+  negativePoints  Float    @default(0)
+  breakdown       Json?    // category-wise scoring
+  suggestions     Json?    // improvement suggestions
+  trend           Float?   // vs last month (+/-)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+  @@map("sustainability_scores")
+  @@index([userId])
+}
+
+model CarbonFootprint {
+  id                  String   @id @default(uuid())
+  userId              String
+  month               Int
+  year                Int
+  totalCarbonKg       Float    @default(0)
+  transportCarbonKg   Float    @default(0)
+  foodCarbonKg        Float    @default(0)
+  shoppingCarbonKg    Float    @default(0)
+  utilityCarbonKg     Float    @default(0)
+  otherCarbonKg       Float    @default(0)
+  breakdown           Json?
+  reductionSuggestions Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+  @@map("carbon_footprints")
+  @@index([userId])
+}
+
+model GreenGoal {
+  id              String         @id @default(uuid())
+  userId          String
+  title           String
+  description     String?
+  goalType        GreenGoalType
+  targetValue     Float
+  currentValue    Float          @default(0)
+  unit            String         @default("%")
+  deadline        DateTime?
+  isCompleted     Boolean        @default(false)
+  completedAt     DateTime?
+  actionPlan      Json?          // AI-generated steps
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("green_goals")
+  @@index([userId])
+}
+
+model EcoReport {
+  id                    String   @id @default(uuid())
+  userId                String
+  month                 Int
+  year                  Int
+  sustainabilityScore   Float    @default(0)
+  totalCarbonKg         Float    @default(0)
+  carbonReductionKg     Float    @default(0)
+  moneySaved            Float    @default(0)
+  sustainableChoices    Int      @default(0)
+  areasToImprove        Json?
+  habitsImproved        Json?
+  recommendations       Json?
+  fileUrl               String?
+  createdAt             DateTime @default(now())
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+  @@map("eco_reports")
+  @@index([userId])
+}
+
+// =================== ENUMS ===================
+
 enum Category {
   FOOD
   TRAVEL
@@ -194,6 +295,9 @@ enum NotificationType {
   MONTHLY_REPORT
   SAVINGS_GOAL
   GENERAL
+  ECO_ALERT
+  GREEN_GOAL_ACHIEVED
+  SUSTAINABILITY_TIP
 }
 
 enum Frequency {
@@ -212,10 +316,40 @@ enum InsightType {
   OVERSPENDING_ALERT
   MONTHLY_ANALYSIS
   BEHAVIOR_INSIGHT
+  ECO_INSIGHT
+  CARBON_ALERT
+  GREEN_RECOMMENDATION
 }
 
 enum ReportType {
   PDF
   CSV
   JSON
+  ECO_PDF
+  ECO_JSON
+}
+
+enum EcoTag {
+  PUBLIC_TRANSPORT
+  LOCAL_SHOPPING
+  SUSTAINABLE_FOOD
+  REUSABLE_PRODUCTS
+  GREEN_ENERGY
+  FAST_FASHION
+  FOOD_DELIVERY
+  RIDE_HAILING
+  IMPULSE_SHOPPING
+  EXCESSIVE_UTILITY
+  NEUTRAL
+}
+
+enum GreenGoalType {
+  REDUCE_FOOD_DELIVERY
+  USE_PUBLIC_TRANSPORT
+  REDUCE_FAST_FASHION
+  REDUCE_IMPULSE_SHOPPING
+  LOWER_CARBON_FOOTPRINT
+  INCREASE_LOCAL_SHOPPING
+  REDUCE_SINGLE_USE
+  CUSTOM
 }

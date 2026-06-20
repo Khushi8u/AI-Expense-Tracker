@@ -99,7 +99,11 @@ export const budgetApi = {
 
 // Report APIs
 export const reportApi = {
-  getMonthly: (params?: any) => api.get('/reports/monthly', { params }),
+  getMonthly: (params?: any) => api.get('/reports/monthly', {
+    params,
+    // Required for binary downloads (PDF/CSV)
+    responseType: params?.format === 'pdf' ? 'blob' : params?.format === 'csv' ? 'blob' : 'json',
+  }),
 };
 
 // Notification APIs
@@ -117,4 +121,17 @@ export const recurringApi = {
   create: (data: any) => api.post('/recurring', data),
   update: (id: string, data: any) => api.put(`/recurring/${id}`, data),
   delete: (id: string) => api.delete(`/recurring/${id}`),
+};
+
+// Sustainability APIs
+export const sustainabilityApi = {
+  getScore: (params?: any) => api.get('/sustainability/score', { params }),
+  getCarbon: (params?: any) => api.get('/sustainability/carbon', { params }),
+  getAlternatives: () => api.get('/sustainability/alternatives'),
+  getRecommendations: () => api.get('/sustainability/recommendations'),
+  getEcoReport: (params?: any) => api.get('/sustainability/report', { params }),
+  getGoals: () => api.get('/sustainability/goals'),
+  createGoal: (data: any) => api.post('/sustainability/goals', data),
+  updateGoalProgress: (id: string, currentValue: number) => api.patch(`/sustainability/goals/${id}/progress`, { currentValue }),
+  deleteGoal: (id: string) => api.delete(`/sustainability/goals/${id}`),
 };

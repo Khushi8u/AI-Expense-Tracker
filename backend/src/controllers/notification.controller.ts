@@ -3,8 +3,8 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 import prisma from '../utils/prisma';
 import { logger } from '../utils/logger';
 
-const getId = (param: string | string[]): string =>
-  Array.isArray(param) ? param[0] : param;
+const getId = (param: string | string[] | undefined): string =>
+  Array.isArray(param) ? param[0] : (param || '');
 
 export const getNotifications = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -34,12 +34,14 @@ export const getNotifications = async (req: AuthRequest, res: Response): Promise
   }
 };
 
+// Handles both PATCH /notifications/all/read and PATCH /notifications/:id/read
 export const markAsRead = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const id = getId(req.params.id);
     const userId = req.user!.userId;
+    const id = getId(req.params.id);
 
-    if (id === 'all') {
+    // Mark ALL as read (route: /all/read)
+    if (!id || id === 'all') {
       await prisma.notification.updateMany({
         where: { userId, isRead: false },
         data: { isRead: true },
@@ -48,6 +50,7 @@ export const markAsRead = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
+    // Mark single notification as read
     await prisma.notification.updateMany({
       where: { id, userId },
       data: { isRead: true },
@@ -57,6 +60,20 @@ export const markAsRead = async (req: AuthRequest, res: Response): Promise<void>
   } catch (error) {
     logger.error('Mark read error:', error);
     res.status(500).json({ error: 'Failed to update notification' });
+  }
+};
+
+export const markAllRead = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!.userId;
+    await prisma.notification.updateMany({
+      where: { userId, isRead: false },
+      data: { isRead: true },
+    });
+    res.json({ message: 'All notifications marked as read' });
+  } catch (error) {
+    logger.error('Mark all read error:', error);
+    res.status(500).json({ error: 'Failed to update notifications' });
   }
 };
 

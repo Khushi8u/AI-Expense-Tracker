@@ -252,7 +252,7 @@ Expense details:
 
 Respond with JSON only: {"category": "CATEGORY_NAME", "confidence": 0.0-1.0}`;
 
-  if (process.env.OPENAI_API_KEY) {
+  if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-')) {
     const OpenAI = (await import('openai')).default;
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const response = await openai.chat.completions.create({
@@ -263,13 +263,13 @@ Respond with JSON only: {"category": "CATEGORY_NAME", "confidence": 0.0-1.0}`;
     });
     const content = response.choices[0]?.message?.content;
     if (content) return JSON.parse(content);
-  } else if (process.env.GEMINI_API_KEY) {
+  } else if (process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.includes('your-')) {
     const { GoogleGenerativeAI } = await import('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    const jsonMatch = text.match(/\{.*\}/s);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) return JSON.parse(jsonMatch[0]);
   }
 

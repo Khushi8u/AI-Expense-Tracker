@@ -13,6 +13,7 @@ import budgetRoutes from './routes/budget.routes';
 import reportRoutes from './routes/report.routes';
 import notificationRoutes from './routes/notification.routes';
 import recurringRoutes from './routes/recurring.routes';
+import sustainabilityRoutes from './routes/sustainability.routes';
 
 dotenv.config();
 
@@ -90,6 +91,7 @@ app.use('/api/budget', budgetRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/recurring', recurringRoutes);
+app.use('/api/sustainability', sustainabilityRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

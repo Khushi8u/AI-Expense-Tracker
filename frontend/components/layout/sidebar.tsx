@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart3, Bell, Brain, ChevronLeft, ChevronRight, CreditCard,
-  Home, LogOut, Receipt, RefreshCw, Settings, Sparkles, Target, User,
+  Home, LogOut, Receipt, RefreshCw, Settings, Sparkles, Target, User, Leaf,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
@@ -18,6 +18,7 @@ const navItems = [
   { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
   { href: '/dashboard/budget', icon: Target, label: 'Budget' },
   { href: '/dashboard/ai-insights', icon: Brain, label: 'AI Insights' },
+  { href: '/dashboard/eco', icon: Leaf, label: 'EcoSpend AI' },
   { href: '/dashboard/recurring', icon: RefreshCw, label: 'Recurring' },
   { href: '/dashboard/receipts', icon: Receipt, label: 'Receipts' },
   { href: '/dashboard/notifications', icon: Bell, label: 'Notifications' },
