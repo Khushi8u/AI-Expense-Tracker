@@ -29,22 +29,24 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
-// CORS - allow both local dev and production frontend
+// CORS - allow localhost, network IP, and production frontend
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:3000',
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://192.168.1.33:3000',  // local network (phone access)
+  process.env.FRONTEND_URL || 'http://localhost:3000',
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // mobile apps, curl, Postman
     if (allowedOrigins.includes(origin)) return callback(null, true);
-    // Allow any netlify.app subdomain
     if (origin.endsWith('.netlify.app')) return callback(null, true);
-    // Allow any onrender.com subdomain
     if (origin.endsWith('.onrender.com')) return callback(null, true);
+    // Allow any 192.168.x.x (local network phones/tablets)
+    if (/^http:\/\/192\.168\.\d+\.\d+:\d+$/.test(origin)) return callback(null, true);
+    if (/^http:\/\/10\.\d+\.\d+\.\d+:\d+$/.test(origin)) return callback(null, true);
     callback(new Error(`CORS blocked: ${origin}`));
   },
   credentials: true,

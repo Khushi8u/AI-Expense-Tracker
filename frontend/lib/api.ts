@@ -1,6 +1,23 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+// Auto-detect backend URL:
+// - On PC browser: uses localhost:5000
+// - On phone (same WiFi): uses the PC's network IP on port 5000
+function getApiUrl(): string {
+  if (typeof window === 'undefined') {
+    // Server-side: use env variable
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  }
+  const host = window.location.hostname;
+  // If accessing via localhost, use localhost backend
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return 'http://localhost:5000';
+  }
+  // If accessing via network IP (e.g. from phone), use same host with port 5000
+  return `http://${host}:5000`;
+}
+
+const API_URL = getApiUrl();
 
 export const api = axios.create({
   baseURL: `${API_URL}/api`,

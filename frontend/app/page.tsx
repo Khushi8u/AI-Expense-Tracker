@@ -55,7 +55,6 @@ const sdgBadges = [
 
 export default function LandingPage() {
   const [statsVisible, setStatsVisible] = useState(false);
-  const [activeFeature, setActiveFeature] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const statsRef = useRef<HTMLDivElement>(null);
 
@@ -72,12 +71,6 @@ export default function LandingPage() {
   // Auto-rotate testimonials
   useEffect(() => {
     const t = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 4000);
-    return () => clearInterval(t);
-  }, []);
-
-  // Auto-rotate features preview
-  useEffect(() => {
-    const t = setInterval(() => setActiveFeature(p => (p + 1) % features.length), 3000);
     return () => clearInterval(t);
   }, []);
 
@@ -251,11 +244,7 @@ export default function LandingPage() {
             {features.map((f, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
                 whileHover={{ y: -6, scale: 1.02 }}
-                onHoverStart={() => setActiveFeature(i)}
-                className={`relative backdrop-blur-sm rounded-2xl p-6 border transition-all duration-300 cursor-default ${activeFeature === i ? 'border-white/30 bg-white/10' : 'border-white/10 bg-white/5 hover:border-white/20'}`}>
-                {activeFeature === i && (
-                  <motion.div layoutId="featureGlow" className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${f.color} opacity-10`} />
-                )}
+                className="relative backdrop-blur-sm rounded-2xl p-6 border border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10 transition-all duration-300 cursor-default">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 text-xl`}>
                   {f.emoji}
                 </div>
