@@ -123,7 +123,23 @@ export const recurringApi = {
   delete: (id: string) => api.delete(`/recurring/${id}`),
 };
 
-// Sustainability APIs
+// Wishlist APIs
+export const wishlistApi = {
+  getAll:     (params?: any) => api.get('/wishlist', { params }),
+  getStats:   () => api.get('/wishlist/stats'),
+  add:        (data: any) => api.post('/wishlist', data),
+  update:     (id: string, data: any) => api.put(`/wishlist/${id}`, data),
+  markBought: (id: string) => api.patch(`/wishlist/${id}/buy`, {}),
+  delete:     (id: string) => api.delete(`/wishlist/${id}`),
+};
+
+// Gamification APIs
+export const gamificationApi = {
+  getStatus:          () => api.get('/gamification/status'),
+  getChallenge:       () => api.get('/gamification/challenge'),
+  completeChallenge:  () => api.post('/gamification/challenge/complete', {}),
+  getCarbonOffset:    () => api.get('/gamification/offset'),
+};
 export const sustainabilityApi = {
   getScore: (params?: any) => api.get('/sustainability/score', { params }),
   getCarbon: (params?: any) => api.get('/sustainability/carbon', { params }),

@@ -14,6 +14,8 @@ import reportRoutes from './routes/report.routes';
 import notificationRoutes from './routes/notification.routes';
 import recurringRoutes from './routes/recurring.routes';
 import sustainabilityRoutes from './routes/sustainability.routes';
+import gamificationRoutes from './routes/gamification.routes';
+import wishlistRoutes from './routes/wishlist.routes';
 
 dotenv.config();
 
@@ -92,6 +94,8 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/recurring', recurringRoutes);
 app.use('/api/sustainability', sustainabilityRoutes);
+app.use('/api/gamification', gamificationRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

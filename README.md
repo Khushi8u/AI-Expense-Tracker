@@ -173,7 +173,7 @@ npm run dev
 
 ### 6. Open the app
 
-Visit **http://localhost:3000**
+Visit **://localhost:3000http**
 
 **Demo account:**
 - Email: `demo@expensetracker.com`

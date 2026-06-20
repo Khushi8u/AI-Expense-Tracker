@@ -6,22 +6,24 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart3, Bell, Brain, ChevronLeft, ChevronRight, CreditCard,
-  Home, LogOut, Receipt, RefreshCw, Settings, Sparkles, Target, User, Leaf,
+  Home, LogOut, Receipt, RefreshCw, Settings, Sparkles, Target, User, Leaf, TreePine, Heart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
 import { toast } from '@/hooks/use-toast';
 
 const navItems = [
-  { href: '/dashboard', icon: Home, label: 'Dashboard' },
-  { href: '/dashboard/expenses', icon: CreditCard, label: 'Expenses' },
-  { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
-  { href: '/dashboard/budget', icon: Target, label: 'Budget' },
-  { href: '/dashboard/ai-insights', icon: Brain, label: 'AI Insights' },
-  { href: '/dashboard/eco', icon: Leaf, label: 'EcoSpend AI' },
-  { href: '/dashboard/recurring', icon: RefreshCw, label: 'Recurring' },
-  { href: '/dashboard/receipts', icon: Receipt, label: 'Receipts' },
-  { href: '/dashboard/notifications', icon: Bell, label: 'Notifications' },
+  { href: '/dashboard',               icon: Home,      label: 'Dashboard' },
+  { href: '/dashboard/expenses',      icon: CreditCard,label: 'Expenses' },
+  { href: '/dashboard/analytics',     icon: BarChart3, label: 'Analytics' },
+  { href: '/dashboard/budget',        icon: Target,    label: 'Budget' },
+  { href: '/dashboard/wishlist',      icon: Heart,     label: 'Wishlist 🛍️' },
+  { href: '/dashboard/ai-insights',   icon: Brain,     label: 'AI Insights' },
+  { href: '/dashboard/eco',           icon: Leaf,      label: 'EcoSpend AI' },
+  { href: '/dashboard/eco-garden',    icon: TreePine,  label: 'Eco Garden 🌳' },
+  { href: '/dashboard/recurring',     icon: RefreshCw, label: 'Recurring' },
+  { href: '/dashboard/receipts',      icon: Receipt,   label: 'Receipts' },
+  { href: '/dashboard/notifications', icon: Bell,      label: 'Notifications' },
 ];
 
 const bottomItems = [
