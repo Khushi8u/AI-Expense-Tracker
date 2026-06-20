@@ -89,8 +89,15 @@ export default function LandingPage() {
             <Badge className="ml-1 bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs">SDG</Badge>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm text-white/60">
-            {['Features', 'Sustainability', 'Pricing', 'About'].map(item => (
-              <button key={item} className="hover:text-white transition-colors">{item}</button>
+            {[
+              { label: 'Features',       href: '#features' },
+              { label: 'Sustainability', href: '#sustainability' },
+              { label: 'About',          href: '#about' },
+            ].map(item => (
+              <a key={item.label} href={item.href}
+                className="hover:text-white transition-colors cursor-pointer">
+                {item.label}
+              </a>
             ))}
           </div>
           <div className="flex items-center gap-2">
@@ -233,7 +240,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
+      <section id="features" className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-center mb-16">
             <Badge className="mb-4 bg-violet-500/20 text-violet-300 border-violet-500/30">9 Powerful Features</Badge>
@@ -257,7 +264,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── SUSTAINABILITY SECTION ── */}
-      <section className="py-24 px-4 bg-gradient-to-b from-transparent to-emerald-950/20">
+      <section id="sustainability" className="py-24 px-4 bg-gradient-to-b from-transparent to-emerald-950/20">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-center mb-16">
             <Badge className="mb-4 bg-emerald-500/20 text-emerald-300 border-emerald-500/30"><Leaf className="w-3 h-3 mr-1" />IBM SkillsBuild · 1M1B Sustainability Internship</Badge>
@@ -326,6 +333,111 @@ export default function LandingPage() {
                   className={`w-2 h-2 rounded-full transition-all ${i === activeTestimonial ? 'bg-violet-400 w-6' : 'bg-white/20'}`} />
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── ABOUT ── */}
+      <section id="about" className="py-24 px-4 sm:px-6 lg:px-8 bg-white/[0.02]">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-center mb-16">
+            <Badge className="mb-4 bg-violet-500/20 text-violet-300 border-violet-500/30">About EcoSpend AI</Badge>
+            <h2 className="text-4xl font-bold mb-4">Built for <span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">IBM SkillsBuild × 1M1B</span></h2>
+            <p className="text-white/50 text-lg max-w-2xl mx-auto">A next-generation AI-powered expense tracker that aligns personal finance with global sustainability goals.</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-16">
+            {/* Project info */}
+            <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} className="space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-3">What is EcoSpend AI?</h3>
+                <p className="text-white/60 leading-relaxed">
+                  EcoSpend AI is a full-stack web application that combines intelligent expense tracking with sustainability scoring.
+                  Every purchase is analyzed for its environmental impact, helping users make greener financial choices while saving money.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-3">Our Mission</h3>
+                <p className="text-white/60 leading-relaxed">
+                  To make sustainable spending fun, measurable, and rewarding. We believe that small daily financial decisions,
+                  when guided by AI, can create a meaningful positive impact on both personal wealth and the planet.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {['Next.js 16', 'TypeScript', 'Node.js', 'PostgreSQL', 'Prisma', 'OpenAI', 'Framer Motion'].map(tech => (
+                  <Badge key={tech} className="bg-white/10 text-white/70 border-white/20 text-xs">{tech}</Badge>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Stats cards */}
+            <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} className="grid grid-cols-2 gap-4">
+              {[
+                { icon: '🤖', title: 'AI-Powered', desc: 'OpenAI & Gemini for smart categorization and financial insights' },
+                { icon: '🌱', title: 'Eco-First', desc: 'Carbon footprint tracking and sustainability scoring for every expense' },
+                { icon: '🏆', title: 'Gamified', desc: '12 eco badges, virtual tree, daily challenges and streak rewards' },
+                { icon: '🔒', title: 'Secure', desc: 'JWT auth, bcrypt hashing, rate limiting and HTTPS throughout' },
+              ].map((s, i) => (
+                <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }}
+                  className="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-colors">
+                  <div className="text-3xl mb-2">{s.icon}</div>
+                  <h4 className="font-semibold text-white text-sm mb-1">{s.title}</h4>
+                  <p className="text-white/40 text-xs leading-relaxed">{s.desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Tech stack & SDGs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* SDG alignment */}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+              className="md:col-span-2 bg-gradient-to-br from-emerald-900/30 to-teal-900/20 border border-emerald-500/20 rounded-2xl p-6">
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><Leaf className="w-5 h-5 text-emerald-400" />UN SDG Alignment</h3>
+              <div className="space-y-4">
+                {[
+                  { sdg: 'SDG 12', name: 'Responsible Consumption & Production', desc: 'Track wasteful spending patterns, suggest sustainable alternatives, score each purchase environmentally.', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+                  { sdg: 'SDG 13', name: 'Climate Action',                        desc: 'Estimate CO₂ emissions per transaction, set carbon reduction goals, track monthly carbon footprint trends.', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+                  { sdg: 'SDG 11', name: 'Sustainable Cities & Communities',      desc: 'Reward public transport usage, local shopping, and community-first spending habits.', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+                ].map((s, i) => (
+                  <div key={i} className={`${s.bg} border ${s.border} rounded-xl p-4`}>
+                    <div className="flex items-start gap-3">
+                      <Badge className={`${s.bg} ${s.color} border-0 text-xs flex-shrink-0`}>{s.sdg}</Badge>
+                      <div>
+                        <p className="text-white font-medium text-sm">{s.name}</p>
+                        <p className="text-white/50 text-xs mt-0.5 leading-relaxed">{s.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Project details */}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+              <h3 className="text-lg font-bold text-white">Project Details</h3>
+              {[
+                { label: 'Program',    value: 'IBM SkillsBuild × 1M1B' },
+                { label: 'Track',      value: 'AI for Sustainability' },
+                { label: 'Frontend',   value: 'Next.js 16 + TypeScript' },
+                { label: 'Backend',    value: 'Node.js + Express' },
+                { label: 'Database',   value: 'PostgreSQL + Neon' },
+                { label: 'AI',         value: 'OpenAI / Gemini API' },
+                { label: 'Deployment', value: 'Netlify + Render' },
+                { label: 'License',    value: 'MIT Open Source' },
+              ].map(d => (
+                <div key={d.label} className="flex justify-between text-sm border-b border-white/5 pb-2">
+                  <span className="text-white/40">{d.label}</span>
+                  <span className="text-white/80 font-medium">{d.value}</span>
+                </div>
+              ))}
+              <a href="https://github.com/Khushi8u/AI-Expense-Tracker" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" size="sm" className="w-full border-white/20 text-white hover:bg-white/10 mt-2">
+                  ⭐ View on GitHub
+                </Button>
+              </a>
+            </motion.div>
           </div>
         </div>
       </section>
