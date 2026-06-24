@@ -9,15 +9,19 @@ export const createOrUpdateBudget = async (req: AuthRequest, res: Response): Pro
     const { month, year, totalBudget, categoryBudgets } = req.body;
     const userId = req.user!.userId;
 
+    const parsedMonth = parseInt(String(month));
+    const parsedYear  = parseInt(String(year));
+    const parsedBudget = parseFloat(String(totalBudget));
+
+    if (!parsedMonth || !parsedYear || isNaN(parsedBudget) || parsedBudget <= 0) {
+      res.status(400).json({ error: 'month, year, and totalBudget are required' });
+      return;
+    }
+
     const budget = await prisma.budget.upsert({
-      where: { userId_month_year: { userId, month: parseInt(month), year: parseInt(year) } },
-      update: { totalBudget: parseFloat(totalBudget) },
-      create: {
-        userId,
-        month: parseInt(month),
-        year: parseInt(year),
-        totalBudget: parseFloat(totalBudget),
-      },
+      where: { userId_month_year: { userId, month: parsedMonth, year: parsedYear } },
+      update: { totalBudget: parsedBudget },
+      create: { userId, month: parsedMonth, year: parsedYear, totalBudget: parsedBudget },
     });
 
     // Update category budgets

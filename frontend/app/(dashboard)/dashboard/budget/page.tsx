@@ -62,8 +62,9 @@ export default function BudgetPage() {
       toast({ title: '✅ Budget saved!' });
       setEditing(false);
       await loadBudget();
-    } catch {
-      toast({ variant: 'destructive', title: 'Failed to save budget' });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || 'Failed to save budget';
+      toast({ variant: 'destructive', title: 'Failed to save budget', description: msg });
     } finally { setSaving(false); }
   };
 
