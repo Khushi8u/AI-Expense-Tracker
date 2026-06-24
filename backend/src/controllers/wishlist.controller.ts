@@ -33,13 +33,18 @@ export const getWishlist = async (req: AuthRequest, res: Response): Promise<void
     if (status === 'bought')  where.isBought = true;
 
     const [items, user] = await Promise.all([
-      prisma.wishlistItem.findMany({ where, orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }] }),
+      prisma.wishlistItem.findMany({ where, orderBy: [{ createdAt: 'desc' }] }),
       prisma.user.findUnique({ where: { id: userId }, select: { preferredCurrency: true, monthlyIncome: true, savingsGoal: true } }),
     ]);
+
+    const PRIORITY_ORDER: Record<string, number> = { DREAM: 4, HIGH: 3, MEDIUM: 2, LOW: 1 };
 
     const totalWishlistValue = items.filter(i => !i.isBought).reduce((s, i) => s + i.price, 0);
     const boughtValue = items.filter(i => i.isBought).reduce((s, i) => s + i.price, 0);
     const avgEcoScore = items.length > 0 ? items.reduce((s, i) => s + i.ecoScore, 0) / items.length : 0;
+
+    // Sort by priority order then date
+    const sorted = items.sort((a, b) => (PRIORITY_ORDER[b.priority] || 0) - (PRIORITY_ORDER[a.priority] || 0));
 
     res.json({
       items,

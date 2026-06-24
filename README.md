@@ -168,12 +168,12 @@ npm run dev
 
 # Terminal 2 - Frontend (port 3000)
 cd frontend
-npm run dev
+npm run devmake
 ```
 
 ### 6. Open the app
 
-Visit **://localhost:3000http**
+Visit **:http//localhost:3000**
 
 **Demo account:**
 - Email: `demo@expensetracker.com`
